@@ -42,7 +42,7 @@ module.exports = (selectors, root) => {
 
   const sao = new MutationObserver(attributeChanged);
   const sdo = new MutationObserver(mainLoop);
-  sdo.observe(root || document, {childList: true, subtree: true});
+  sdo.observe(root, {childList: true, subtree: true});
 
   return (
     target,
