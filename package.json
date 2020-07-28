@@ -12,7 +12,12 @@
     "fix:default": "sed -i 's/({})/({}).default/' index.js && sed -i 's/({})/({}).default/' es.js && sed -i 's/({})/({}).default/' min.js",
     "size": "cat min.js | gzip -9 | wc -c && cat min.js | brotli | wc -c && cat es.js | gzip -9 | wc -c && cat es.js | brotli | wc -c"
   },
-  "keywords": ["custom", "elements", "like", "callbacks"],
+  "keywords": [
+    "custom",
+    "elements",
+    "like",
+    "callbacks"
+  ],
   "author": "Andrea Giammarchi",
   "license": "ISC",
   "devDependencies": {
@@ -34,5 +39,13 @@
   "unpkg": "min.js",
   "dependencies": {
     "shared-document-observer": "^0.1.2"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WebReflection/as-ce.git"
+  },
+  "bugs": {
+    "url": "https://github.com/WebReflection/as-ce/issues"
+  },
+  "homepage": "https://github.com/WebReflection/as-ce#readme"
 }
