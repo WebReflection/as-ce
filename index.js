@@ -1,21 +1,7 @@
 self.ce = (function (exports) {
   'use strict';
 
-  var set = new Set();
-  var observer = new MutationObserver(function (records) {
-    set.forEach(invoke, records);
-  });
-  observer.observe(document, {
-    subtree: true,
-    childList: true
-  });
-  set.observer = observer;
-
-  function invoke(callback) {
-    callback(this, observer);
-  }
-
-  var index = (function (selectors) {
+  var index = (function (selectors, root) {
     var wm = new WeakMap();
 
     var attributeChanged = function attributeChanged(records) {
@@ -58,7 +44,7 @@ self.ce = (function (exports) {
       }
     };
 
-    var set$1 = function set(target) {
+    var set = function set(target) {
       var sets = {
         a: {},
         c: new Set(),
@@ -69,15 +55,19 @@ self.ce = (function (exports) {
     };
 
     var sao = new MutationObserver(attributeChanged);
-    set.add(mainLoop);
+    var sdo = new MutationObserver(mainLoop);
+    sdo.observe(root || document, {
+      childList: true,
+      subtree: true
+    });
     return function (target, _ref) {
       var connectedCallback = _ref.connectedCallback,
           disconnectedCallback = _ref.disconnectedCallback,
           observedAttributes = _ref.observedAttributes,
           attributeChangedCallback = _ref.attributeChangedCallback;
-      mainLoop(set.observer.takeRecords());
+      mainLoop(sdo.takeRecords());
 
-      var _ref2 = wm.get(target) || set$1(target),
+      var _ref2 = wm.get(target) || set(target),
           a = _ref2.a,
           c = _ref2.c,
           d = _ref2.d;

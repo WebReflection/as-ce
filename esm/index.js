@@ -1,6 +1,4 @@
-import sdo from 'shared-document-observer';
-
-export default selectors => {
+export default (selectors, root) => {
   const wm = new WeakMap;
 
   const attributeChanged = records => {
@@ -42,7 +40,8 @@ export default selectors => {
   };
 
   const sao = new MutationObserver(attributeChanged);
-  sdo.add(mainLoop);
+  const sdo = new MutationObserver(mainLoop);
+  sdo.observe(root || document, {childList: true, subtree: true});
 
   return (
     target,
@@ -55,7 +54,7 @@ export default selectors => {
       attributeChangedCallback
     }
   ) => {
-    mainLoop(sdo.observer.takeRecords());
+    mainLoop(sdo.takeRecords());
     const {a, c, d} = wm.get(target) || set(target);
     if (observedAttributes) {
       sao.observe(target, {
