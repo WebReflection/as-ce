@@ -1,14 +1,13 @@
 'use strict';
 module.exports = (root, upgrade) => {
   const wm = new WeakMap;
+  const ao = new WeakMap;
 
-  const attributeChanged = records => {
+  const attributeChanged = (records, mo) => {
     for (let i = 0, {length} = records; i < length; i++) {
       const {target, attributeName, oldValue} = records[i];
       const newValue = target.getAttribute(attributeName);
-      wm.get(target).a[attributeName].forEach(attributeChangedCallback => {
-        attributeChangedCallback.call(target, attributeName, oldValue, newValue);
-      });
+      ao.get(mo).call(target, attributeName, oldValue, newValue);
     }
   };
 
@@ -30,18 +29,16 @@ module.exports = (root, upgrade) => {
     for (let i = 0, {length} = records; i < length; i++) {
       const {addedNodes, removedNodes} = records[i];
       invoke(addedNodes, 'c', new Set, false);
-      attributeChanged(sao.takeRecords());
       invoke(removedNodes, 'd', new Set, false);
     }
   };
 
   const set = target => {
-    const sets = {a: {}, c: new Set, d: new Set};
+    const sets = {c: new Set, d: new Set};
     wm.set(target, sets);
     return sets;
   };
 
-  const sao = new MutationObserver(attributeChanged);
   const sdo = new MutationObserver(mainLoop);
   sdo.observe(root, {childList: true, subtree: true});
 
@@ -57,24 +54,24 @@ module.exports = (root, upgrade) => {
     }
   ) => {
     mainLoop(sdo.takeRecords());
-    const {a, c, d} = wm.get(target) || set(target);
+    const {c, d} = wm.get(target) || set(target);
     if (observedAttributes) {
-      sao.observe(target, {
+      const mo = new MutationObserver(attributeChanged);
+      mo.observe(target, {
         attributes: true,
         attributeOldValue: true,
-        attributeFilter: observedAttributes
+        attributeFilter: observedAttributes.map(attributeName => {
+          if (target.hasAttribute(attributeName))
+            attributeChangedCallback.call(
+              target,
+              attributeName,
+              null,
+              target.getAttribute(attributeName)
+            );
+          return attributeName;
+        })
       });
-      observedAttributes.forEach(attributeName => {
-        (a[attributeName] || (a[attributeName] = new Set))
-          .add(attributeChangedCallback);
-        if (target.hasAttribute(attributeName))
-          attributeChangedCallback.call(
-            target,
-            attributeName,
-            null,
-            target.getAttribute(attributeName)
-          );
-      });
+      ao.set(mo, attributeChangedCallback);
     }
     if (disconnectedCallback)
       d.add(disconnectedCallback);
