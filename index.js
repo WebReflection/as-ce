@@ -16,16 +16,8 @@ self.ce = (function (exports) {
       }
     };
 
-    var invoke = function invoke(nodes, key, parsed, isQSA) {
-      for (var i = 0, length = nodes.length; i < length; i++) {
-        var target = nodes[i];
-
-        if (!parsed.has(target) && (isQSA || 'querySelectorAll' in target)) {
-          parsed.add(target);
-          if (wm.has(target)) wm.get(target)[key].forEach(call, target);else if (key === 'c') upgrade(target);
-          invoke(target.querySelectorAll('*'), key, parsed, true);
-        }
-      }
+    var elements = function elements(target) {
+      return 'querySelectorAll' in target;
     };
 
     var mainLoop = function mainLoop(records) {
@@ -33,8 +25,20 @@ self.ce = (function (exports) {
         var _records$i2 = records[i],
             addedNodes = _records$i2.addedNodes,
             removedNodes = _records$i2.removedNodes;
-        invoke(addedNodes, 'c', new Set(), false);
-        invoke(removedNodes, 'd', new Set(), false);
+        parse(addedNodes.filter(elements), 'c', new Set());
+        parse(removedNodes.filter(elements), 'd', new Set());
+      }
+    };
+
+    var parse = function parse(nodes, key, parsed) {
+      for (var i = 0, length = nodes.length; i < length; i++) {
+        var target = nodes[i];
+
+        if (!parsed.has(target)) {
+          parsed.add(target);
+          if (wm.has(target)) wm.get(target)[key].forEach(call, target);else if (key === 'c') upgrade(target);
+          parse(target.querySelectorAll('*'), key, parsed);
+        }
       }
     };
 

@@ -11,25 +11,27 @@ module.exports = (root, upgrade) => {
     }
   };
 
-  const invoke = (nodes, key, parsed, isQSA) => {
+  const elements = target => 'querySelectorAll' in target;
+
+  const mainLoop = records => {
+    for (let i = 0, {length} = records; i < length; i++) {
+      const {addedNodes, removedNodes} = records[i];
+      parse(addedNodes.filter(elements), 'c', new Set);
+      parse(removedNodes.filter(elements), 'd', new Set);
+    }
+  };
+
+  const parse = (nodes, key, parsed) => {
     for (let i = 0, {length} = nodes; i < length; i++) {
       const target = nodes[i];
-      if (!parsed.has(target) && (isQSA || ('querySelectorAll' in target))) {
+      if (!parsed.has(target)) {
         parsed.add(target);
         if (wm.has(target))
           wm.get(target)[key].forEach(call, target);
         else if (key === 'c')
           upgrade(target);
-        invoke(target.querySelectorAll('*'), key, parsed, true);
+        parse(target.querySelectorAll('*'), key, parsed);
       }
-    }
-  };
-
-  const mainLoop = records => {
-    for (let i = 0, {length} = records; i < length; i++) {
-      const {addedNodes, removedNodes} = records[i];
-      invoke(addedNodes, 'c', new Set, false);
-      invoke(removedNodes, 'd', new Set, false);
     }
   };
 
