@@ -1,7 +1,7 @@
 self.ce = (function (exports) {
   'use strict';
 
-  var index = (function (root, setup) {
+  var index = (function (root, upgrade) {
     var wm = new WeakMap();
 
     var attributeChanged = function attributeChanged(records) {
@@ -27,7 +27,7 @@ self.ce = (function (exports) {
 
         if (!parsed.has(target) && (isQSA || 'querySelectorAll' in target)) {
           parsed.add(target);
-          if (wm.has(target)) wm.get(target)[key].forEach(call, target);else if (key === 'c') setup(target, parsed);
+          if (wm.has(target)) wm.get(target)[key].forEach(call, target);else if (key === 'c') upgrade(target);
           invoke(target.querySelectorAll('*'), key, parsed, true);
         }
       }

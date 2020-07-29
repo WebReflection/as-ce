@@ -1,5 +1,5 @@
 'use strict';
-module.exports = (root, setup) => {
+module.exports = (root, upgrade) => {
   const wm = new WeakMap;
 
   const attributeChanged = records => {
@@ -20,7 +20,7 @@ module.exports = (root, setup) => {
         if (wm.has(target))
           wm.get(target)[key].forEach(call, target);
         else if (key === 'c')
-          setup(target, parsed);
+          upgrade(target);
         invoke(target.querySelectorAll('*'), key, parsed, true);
       }
     }
