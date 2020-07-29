@@ -4,6 +4,7 @@ self.ce = (function (exports) {
   var index = (function (root, upgrade) {
     var wm = new WeakMap();
     var ao = new WeakMap();
+    var filter = [].filter;
 
     var attributeChanged = function attributeChanged(records, mo) {
       for (var i = 0, length = records.length; i < length; i++) {
@@ -25,8 +26,8 @@ self.ce = (function (exports) {
         var _records$i2 = records[i],
             addedNodes = _records$i2.addedNodes,
             removedNodes = _records$i2.removedNodes;
-        parse(addedNodes.filter(elements), 'c', new Set());
-        parse(removedNodes.filter(elements), 'd', new Set());
+        parse(filter.call(addedNodes, elements), 'c', new Set());
+        parse(filter.call(removedNodes, elements), 'd', new Set());
       }
     };
 

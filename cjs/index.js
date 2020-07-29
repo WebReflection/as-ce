@@ -2,6 +2,7 @@
 module.exports = (root, upgrade) => {
   const wm = new WeakMap;
   const ao = new WeakMap;
+  const {filter} = [];
 
   const attributeChanged = (records, mo) => {
     for (let i = 0, {length} = records; i < length; i++) {
@@ -16,8 +17,8 @@ module.exports = (root, upgrade) => {
   const mainLoop = records => {
     for (let i = 0, {length} = records; i < length; i++) {
       const {addedNodes, removedNodes} = records[i];
-      parse(addedNodes.filter(elements), 'c', new Set);
-      parse(removedNodes.filter(elements), 'd', new Set);
+      parse(filter.call(addedNodes, elements), 'c', new Set);
+      parse(filter.call(removedNodes, elements), 'd', new Set);
     }
   };
 
