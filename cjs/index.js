@@ -1,5 +1,5 @@
 'use strict';
-module.exports = (selectors, root) => {
+module.exports = (root, setup) => {
   const wm = new WeakMap;
 
   const attributeChanged = records => {
@@ -12,15 +12,16 @@ module.exports = (selectors, root) => {
     }
   };
 
-  const invoke = (nodes, key, parsed, noCheck) => {
+  const invoke = (nodes, key, parsed, isQSA) => {
     for (let i = 0, {length} = nodes; i < length; i++) {
       const target = nodes[i];
-      if (!parsed.has(target) && (noCheck || ('querySelectorAll' in target))) {
+      if (!parsed.has(target) && (isQSA || ('querySelectorAll' in target))) {
         parsed.add(target);
         if (wm.has(target))
           wm.get(target)[key].forEach(call, target);
-        if (selectors.length)
-          invoke(target.querySelectorAll(selectors), key, parsed, true);
+        else if (key === 'c')
+          setup(target, parsed);
+        invoke(target.querySelectorAll('*'), key, parsed, true);
       }
     }
   };
