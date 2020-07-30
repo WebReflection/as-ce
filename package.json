@@ -1,6 +1,6 @@
 {
   "name": "@webreflection/as-custom-element",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "Custom Elements like callbacks for any node",
   "main": "./cjs/index.js",
   "scripts": {
