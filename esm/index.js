@@ -1,4 +1,4 @@
-export default (root, upgrade) => {
+export default (root, upgrade, query) => {
   const wm = new WeakMap;
   const ao = new WeakMap;
   const {filter} = [];
@@ -14,10 +14,12 @@ export default (root, upgrade) => {
   const elements = target => 'querySelectorAll' in target;
 
   const mainLoop = records => {
-    for (let i = 0, {length} = records; i < length; i++) {
-      const {addedNodes, removedNodes} = records[i];
-      parse(filter.call(addedNodes, elements), 'c', new Set);
-      parse(filter.call(removedNodes, elements), 'd', new Set);
+    if (query.length) {
+      for (let i = 0, {length} = records; i < length; i++) {
+        const {addedNodes, removedNodes} = records[i];
+        parse(filter.call(addedNodes, elements), 'c', new Set);
+        parse(filter.call(removedNodes, elements), 'd', new Set);
+      }
     }
   };
 
@@ -30,7 +32,7 @@ export default (root, upgrade) => {
           wm.get(target)[key].forEach(call, target);
         else if (key === 'c')
           upgrade(target);
-        parse(target.querySelectorAll('*'), key, parsed);
+        parse(target.querySelectorAll(query), key, parsed);
       }
     }
   };
